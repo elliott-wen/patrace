@@ -578,8 +578,8 @@ void after_glMapBufferRange(GLenum target, GLsizeiptr length, GLbitfield access,
     {
         DBG_LOG("WARNING! GL_MAP_PERSISTENT_BIT is set to parameter 'access' of glMapBufferRange(). \n");
         DBG_LOG("It may cause the trace to work abnormal.\n");
-        DBG_LOG("Suggest adding a parameter to /data/apitrace/tracerparams.cfg to disable the GL_EXT_buffer_storage extension:\n");
-        DBG_LOG("    echo \"DisableBufferStorage true\" >> /data/apitrace/tracerparams.cfg\n");
+        DBG_LOG("Suggest adding a parameter to /data/local/tmp/apitrace/tracerparams.cfg to disable the GL_EXT_buffer_storage extension:\n");
+        DBG_LOG("    echo \"DisableBufferStorage true\" >> /data/local/tmp/apitrace/tracerparams.cfg\n");
     }
 }
 
@@ -876,7 +876,7 @@ static bool TakeSnapshot(int frNoOverride = -1)
 
     char filename[128];
 #ifdef ANDROID
-    const char* snapPath = "/data/apitrace/snap/";
+    const char* snapPath = "/data/local/tmp/apitrace/snap/";
 #else
     const char* snapPath = "snap/";
 #endif

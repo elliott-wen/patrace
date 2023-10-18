@@ -365,7 +365,7 @@ int getTemporaryFile(const char* description, std::string& path)
 {
     char tmpbuf[256];
 #ifdef ANDROID
-#define TMP_DIR "/sdcard/apitrace/"
+#define TMP_DIR "/data/local/tmp/apitrace/tmp_dir"
 #else
 #define TMP_DIR "/tmp/"
 #endif

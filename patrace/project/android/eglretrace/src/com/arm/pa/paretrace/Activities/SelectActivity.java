@@ -132,7 +132,7 @@ public class SelectActivity extends Activity
 
     private void setupTraceList(){
     	mTraceList.clear();
-        appendTracesInDir(new File("/data/apitrace"), true, mTraceList);
+        appendTracesInDir(new File("/data/local/tmp/apitrace"), true, mTraceList);
         appendTracesInDir(new File(Util.getTraceFilePath()), true, mTraceList);
         Collections.sort(mTraceList, Trace.fileNameComparator);
     }

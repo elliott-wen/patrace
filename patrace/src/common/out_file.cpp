@@ -215,7 +215,7 @@ os::String OutFile::AutogenTraceFileName()
 
 #ifdef ANDROID
     unsigned int sCounter = 0;
-    os::String prefix = "/data/apitrace/";
+    os::String prefix = "/data/local/tmp/apitrace/";
     os::String process = os::getProcessName();
     prefix.join(process);
 

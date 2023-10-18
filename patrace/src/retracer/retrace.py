@@ -729,8 +729,8 @@ class Retracer(object):
                 print('    {')
                 print('        DBG_LOG("WARNING! GL_MAP_PERSISTENT_BIT is set to access parameter for glMapBufferRange(). \\n");')
                 print('        DBG_LOG("It may cause the retrace to work abnormally.\\n");')
-                print('        DBG_LOG("Suggest adding a parameter to /data/apitrace/tracerparams.cfg to disable the GL_EXT_buffer_storage extension.\\n");')
-                print('        DBG_LOG("    echo \\"DisableBufferStorage true\\" >> /data/apitrace/tracerparams.cfg\\n");')
+                print('        DBG_LOG("Suggest adding a parameter to /data/local/tmp/apitrace/tracerparams.cfg to disable the GL_EXT_buffer_storage extension.\\n");')
+                print('        DBG_LOG("    echo \\"DisableBufferStorage true\\" >> /data/local/tmp/apitrace/tracerparams.cfg\\n");')
                 print('        DBG_LOG("Then trace again to get a new pat file.\\n");')
                 print('    }')
             func.has_context = True

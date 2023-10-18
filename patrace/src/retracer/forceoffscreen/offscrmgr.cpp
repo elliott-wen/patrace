@@ -291,7 +291,7 @@ void OffscreenManager::OffscreenToMosaic()
     if (no < 10)
     {
         char filename[128];
-        sprintf(filename, "/data/apitrace/fbo%06u.png", glretrace::gFrameNo);
+        sprintf(filename, "/data/local/tmp/apitrace/fbo%06u.png", glretrace::gFrameNo);
         glretrace::Snapshot(filename);
     }
 #endif
@@ -331,7 +331,7 @@ void OffscreenManager::OffscreenToMosaic()
     if (no < 10)
     {
         char filename[128];
-        sprintf(filename, "/data/apitrace/mosaic%06u.png", glretrace::gFrameNo);
+        sprintf(filename, "/data/local/tmp/apitrace/mosaic%06u.png", glretrace::gFrameNo);
         glretrace::Snapshot(filename);
     }
 #endif

@@ -80,7 +80,7 @@ os::String Path::generateStateLogPath()
 os::String Path::getTraceFilePathPatternAndroid()
 {
     os::String process = os::getProcessName();
-    return os::String::format("/data/apitrace/%s/%s.%%u.pat", process.str(), process.str());
+    return os::String::format("/data/local/tmp/apitrace/%s/%s.%%u.pat", process.str(), process.str());
 }
 
 os::String Path::getTraceFilePathPatternDesktop()
@@ -93,7 +93,7 @@ os::String Path::getTraceFilePathPatternDesktop()
 os::String Path::getAndroidPath()
 {
     os::String process = os::getProcessName();
-    return os::String::format("/data/apitrace/%s/", process.str());
+    return os::String::format("/data/local/tmp/apitrace/%s/", process.str());
 }
 
 os::String Path::getDesktopPath()
