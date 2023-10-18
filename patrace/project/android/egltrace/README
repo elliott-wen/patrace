@@ -105,7 +105,7 @@ You can skip this step by using the pre-built binaries in
     // executed on your host machine
     $ adb shell
     // executed on the Android shell
-    # mkdir /data/apitrace
+    # mkdir /data/local/tmp/apitrace
     
 4.2 Create "/system/lib/egl/appList.cfg", which is used to specify the names of the applications that we want to trace.
     // executed on your host machine
@@ -123,5 +123,5 @@ You can skip this step by using the pre-built binaries in
     2) Run the application, either by the user interface or by adb shell. 
     3) Select one test case, and run it.
     4) While the application is running, you can use adb logcat to inspect the log.
-    5) After the selected case finish, you'll get an output trace file which name is 'com.glbenchmark.glbenchmark20.trace' in '/data/apitrace' folder. If you run the same case again without remove this file, you'll get another output file 'com.glbenchmark.glbenchmark20.1.trace'.
+    5) After the selected case finish, you'll get an output trace file which name is 'com.glbenchmark.glbenchmark20.trace' in '/data/local/tmp/apitrace' folder. If you run the same case again without remove this file, you'll get another output file 'com.glbenchmark.glbenchmark20.1.trace'.
     6) At last, you may want to use 'adb pull' to transfer the trace file to your host machine. Then, you can use 'eglretrace' to replay it. You can also use 'qapitrace' to open it and inspect each function call in it.

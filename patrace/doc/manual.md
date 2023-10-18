@@ -204,14 +204,14 @@ Install the interceptor and configure it:
     chmod 644 /system/lib/egl/interceptor.cfg  
     chmod 644 /system/lib64/egl/interceptor.cfg  
 
-    mkdir /data/apitrace  
-    chmod 777 /data/apitrace
+    mkdir /data/local/tmp/apitrace  
+    chmod 777 /data/local/tmp/apitrace
 
 Sometimes you will need to store the traces on the SD card instead:
 
     adb shell su -c mkdir /sdcard/patrace  
     adb shell su -c chmod 777 /sdcard/patrace  
-    adb shell su -c ln -s /sdcard/Android/data /data/apitrace  
+    adb shell su -c ln -s /sdcard/Android/data /data/local/tmp/apitrace  
 
 For Android before version 4.4, you need to update `egl.cfg`. Either update you `egl.cfg` manually, or use the provided one:
 
@@ -263,8 +263,8 @@ Similarly, install the interceptor to /vendor/lib(64)/egl and configure it:
     chmod 644 /vendor/lib/egl/interceptor.cfg  
     chmod 644 /vendor/lib64/egl/interceptor.cfg  
 
-    mkdir /data/apitrace  
-    chmod 777 /data/apitrace  
+    mkdir /data/local/tmp/apitrace  
+    chmod 777 /data/local/tmp/apitrace  
     
 Note that in case of error remounting /vendor even as root, look at the section GLES Layer. 
 
@@ -331,14 +331,14 @@ Add the name to `/system/lib/egl/appList.cfg` (32 bit) or `/system/lib64/egl/app
 
 If `/system/lib[64]/egl/` does not exist, you can also use `/system/vendor/lib/egl/` is also OK.
 
-Create the output trace directory in advance, which will be named /data/apitrace/&lt;package name&gt;. Give it 777 permissions.
+Create the output trace directory in advance, which will be named /data/local/tmp/apitrace/&lt;package name&gt;. Give it 777 permissions.
 
 Example:
 
     echo com.arm.mali.Timbuktu >> /system/lib/egl/appList.cfg
     chmod 644 /system/lib/egl/appList.cfg  
-    mkdir -p /data/apitrace/com.arm.mali.Timbuktu
-    chmod 777 /data/apitrace/com.arm.mali.Timbuktu
+    mkdir -p /data/local/tmp/apitrace/com.arm.mali.Timbuktu
+    chmod 777 /data/local/tmp/apitrace/com.arm.mali.Timbuktu
 
 Make sure `/system/lib[64]/egl/appList.cfg` is world readable.
 
@@ -354,7 +354,7 @@ It is possible to trace non-native resolutions on Android by switching window re
 
 #### Tracing on Samsung S8
 
-More restrictions have been added on Android. You will need to pre-create the target trace directory, adnd use chcon to set the Selinux file permissions on it, for example `chcon u:object_r:app_data_file:s0:c512,c768 /data/apitrace/com.futuremark.dmandroid`, in addition to setting the permissions to 777. You can also no longer 'adb pull' the file directly from this directory, but have to go by the way of /sdcard/.
+More restrictions have been added on Android. You will need to pre-create the target trace directory, adnd use chcon to set the Selinux file permissions on it, for example `chcon u:object_r:app_data_file:s0:c512,c768 /data/local/tmp/apitrace/com.futuremark.dmandroid`, in addition to setting the permissions to 777. You can also no longer 'adb pull' the file directly from this directory, but have to go by the way of /sdcard/.
 
 #### Tracing on Android with Treble enabled
 
@@ -393,7 +393,7 @@ The most useful keyword is 'FilterSupportedExtension', which, if set to 'true', 
 
 ### Special features of PaTrace Tracer
 
-You may enable or disable extensions, this is useful to create traces that don't use certain extensions. Limiting the extensions an app 'sees' is useful when you want to create a tracefile that is compatible with devices that don't support a given extension. How it works; when an app calls `glGetString(GL_EXTENSIONS)`, only the ones enabled in `/data/apitrace/tracerparams.cfg` will be returned to the app. Unfortunately, some applications ignore or don't use this information, and may use certain extensions, anyways.The tracer will ignore some extensions like the binary shader extensions by default. You can override this by explicitly listing the extensions to use in `tracerparams.cfg`, as described 
+You may enable or disable extensions, this is useful to create traces that don't use certain extensions. Limiting the extensions an app 'sees' is useful when you want to create a tracefile that is compatible with devices that don't support a given extension. How it works; when an app calls `glGetString(GL_EXTENSIONS)`, only the ones enabled in `/data/local/tmp/apitrace/tracerparams.cfg` will be returned to the app. Unfortunately, some applications ignore or don't use this information, and may use certain extensions, anyways.The tracer will ignore some extensions like the binary shader extensions by default. You can override this by explicitly listing the extensions to use in `tracerparams.cfg`, as described 
 above.The full list of extensions that the device supports will be saved in the trace header.
 
 We never want binary shaders in the resulting trace file, since it can then only be retraced on the same platform. Since binary shaders are supported in GLES3, merely disabling the binary shader extensions may not be enough. You may have to go into Android app settings, and flush all app caches before you run the app to make sure the shader caches are cleared, 
@@ -427,7 +427,7 @@ First, enable GLES layer by running `adb shell setprop debug.gles.layers libGLES
 Then, find which directory to place the GLES layer by running `adb logcat | grep libEGL`, while starting the game. It will list where it is searching for the GLES layer. Copy the GLES layer to this directory, and give it 755 permission.
 
 ### Tracing on Android
-Create the output trace directory in advance, which will be named `/data/apitrace/<package_name>`. Give it 777 permission, and run `chcon u:object_r:app_data_file:s0:c512,c768 /data/apitrace/<package_name>`
+Create the output trace directory in advance, which will be named `/data/local/tmp/apitrace/<package_name>`. Give it 777 permission, and run `chcon u:object_r:app_data_file:s0:c512,c768 /data/local/tmp/apitrace/<package_name>`
 After that, run the application and tracing will begin automatically.
 
 Retracing
@@ -460,7 +460,7 @@ On the FPGA with dummy winsys, you need to specify some extra environment variab
 ### Retracing on Android
 
 -   Install `eglretrace-release.apk`
--   If you need to use the GUI, copy original/modified traces to `/data/apitrace/` or `/sdcard/apitrace/trace_repo`. (they will already be in `/data/apitrace` if they are traces from the device).
+-   If you need to use the GUI, copy original/modified traces to `/data/local/tmp/apitrace/` or `/sdcard/apitrace/trace_repo`. (they will already be in `/data/local/tmp/apitrace` if they are traces from the device).
 -   Run the `PARetrace` app.
 -   Select a trace to start retracing it.
 -   For extra parameters, such as setting a custom screen resolution, thread ID etc, start the retracer using am as shown below.
@@ -616,9 +616,9 @@ There are three different ways to tell the retracer which parameters that should
 | `--ez removeUnusedAttributes`| true/false(default) Modify the shader in runtime by removing attributes that were not enabled during tracing. When this is enabled, 'storeProgramInformation' is automatically turned on.                                                                                                                                                                                  |
 | `--ez storeProgramInfo`    | true/false(default) In the result file, store information about a program after each glLinkProgram. Such as, active attributes and compile errors.                                                                                                                                                                                                                           |
 | `--es cpumask`             | Lock all work associated with this replay to the specified CPU cores, given as a string of one or zero for each core.                                                                                                                                                                                                                                                        |
-| `--es jsonData`            | path to a JSON file containing parameters, e.g. /data/apitrace/input.json. Only works together with traceFilePath and resultFile, any other options don't work anymore                                                                                                                                                                                                       |
-| `--es traceFilePath`       | base path to trace file storage, e.g. /data/apitrace                                                                                                                                                                                                                                                                                                                         |
-| `--es resultFile`          | path to output result file, e.g. /data/apitrace/result.json                                                                                                                                                                                                                                                                                                                  |
+| `--es jsonData`            | path to a JSON file containing parameters, e.g. /data/local/tmp/apitrace/input.json. Only works together with traceFilePath and resultFile, any other options don't work anymore                                                                                                                                                                                                       |
+| `--es traceFilePath`       | base path to trace file storage, e.g. /data/local/tmp/apitrace                                                                                                                                                                                                                                                                                                                         |
+| `--es resultFile`          | path to output result file, e.g. /data/local/tmp/apitrace/result.json                                                                                                                                                                                                                                                                                                                  |
 | `--ez multithread`         | true/false(default) Multithread execution mode.                                                                                                                                                                                                                                                                                                                          |
 | `--ez enOverlay`           | If true(default), enable overlay all the surfaces when there is more then one surface created. If false, all the surfaces will be splited horizontally in a slider container.                                                                                                                                                                                                |
 | `--ei transparent`         | The alpha value of each surface, when using Overlay layout. The default is 100 (opaque).                                                                                                                                                                                                                                                                                     |
@@ -705,7 +705,7 @@ This is an example of a JSON parameter file:
      "file": "./egypt_hd_10fps.orig.std.etc1.gles2.pat",
      "frames": "4-200",
      "snapshotCallset": "4-5/frame",
-     "snapshotPrefix": "/data/apitrace/snap/frame_",
+     "snapshotPrefix": "/data/local/tmp/apitrace/snap/frame_",
      "landscape": true,
      "offscreen": false,
      "overrideHeight": 720,

@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_map>
 #include <algorithm>
+#include <limits>
 #include "eglstate/common.hpp"
 #include "base/base.hpp"
 #include "commonData.hpp"
