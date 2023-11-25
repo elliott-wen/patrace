@@ -75,7 +75,7 @@ public:
     common::ClientSideBufferObjectSet mCSBufferSet;
 
     // The buffer and mutex used during capturing
-    const static int WRITE_BUF_LEN = (150*1024*1024);
+    const static int WRITE_BUF_LEN = (192*1024*1024);
     char* writebuf = nullptr;
     std::recursive_mutex callMutex;
 
@@ -87,7 +87,7 @@ public:
     TraceOut();
     ~TraceOut();
 
-    inline void Write(const void* buf, unsigned int len)
+    void Write(const void* buf, unsigned int len)
     {
         if (mpBinAndMeta == NULL)
         {
@@ -97,7 +97,7 @@ public:
         mpBinAndMeta->write(buf, len);
     }
 
-    inline void WriteBuf(const char *endPointer)
+    void WriteBuf(const char *endPointer)
     {
         const int size = endPointer - writebuf;
         if (size > WRITE_BUF_LEN)

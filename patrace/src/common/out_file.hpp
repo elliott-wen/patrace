@@ -10,7 +10,7 @@
 
 namespace common {
 
-#define SNAPPY_CHUNK_SIZE (1*1024*1024)
+#define SNAPPY_CHUNK_SIZE (4*1024*1024)
 
 class OutFile {
 public:

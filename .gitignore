@@ -60,6 +60,8 @@ patrace/project/android/patracesweep/local.properties
 patrace/project/android/patracesweep/project.properties
 patrace/project/android/patracesweep/proguard-project.txt
 patrace/project/android/integration_tests/app/
+patrace/project/android/gleslayer/obj/
+patrace/project/android/gleslayer/build/
 
 # Created by build script from template
 patrace/project/android/gatewayclient/res/values/strings.xml
