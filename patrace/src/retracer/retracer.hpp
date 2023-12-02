@@ -26,6 +26,7 @@
 #include <unordered_map>
 #include <map>
 #include <mutex>
+#include <list>
 
 #ifdef __APPLE__
 #include "TargetConditionals.h"
@@ -179,6 +180,7 @@ private:
         uint64_t time = 0;
     };
     std::unordered_map<std::string, CallStat> mCallStats;
+    std::list<uint64_t> mCallTimes;
 
     pid_t child = 0;
 

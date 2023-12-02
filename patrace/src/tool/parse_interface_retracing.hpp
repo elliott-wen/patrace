@@ -40,10 +40,10 @@ public:
     virtual void cleanup() override;
     void outputTexUsage(std::unordered_set<unsigned int>& unusedMipgen, std::unordered_set<unsigned int>& unusedTexture, std::unordered_set<unsigned int>& unusedShader);
 
-    virtual int64_t getCpuCycles() { return mCpuCycles; }
+    virtual int64_t getCpuCycles() override { return mCpuCycles; }
 
-    virtual void completed_drawcall(int frame, const DrawParams& params, const StateTracker::RenderPass &rp);
-    virtual void completed_renderpass(const StateTracker::RenderPass &rp);
+    virtual void completed_drawcall(int frame, const DrawParams& params, const StateTracker::RenderPass &rp) override;
+    virtual void completed_renderpass(const StateTracker::RenderPass &rp) override;
 
 private:
     void thread(const int threadidx, const int our_tid, Callback c, void *data);

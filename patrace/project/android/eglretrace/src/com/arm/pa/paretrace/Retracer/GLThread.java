@@ -429,6 +429,7 @@ public class GLThread extends Thread {
                 e.printStackTrace();
             }
 
+
             json_data = js.toString();
         }
 

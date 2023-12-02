@@ -475,7 +475,7 @@ public class SelectActivity extends Activity
     	for (Map.Entry<String, Boolean> entry: mTraceOptionValues.entrySet()){
 			intent.putExtra(entry.getKey(), entry.getValue());
     	}
-
+        
         this.startActivity(intent);
     }
 

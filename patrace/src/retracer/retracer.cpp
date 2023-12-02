@@ -75,15 +75,15 @@ static inline uint64_t gettime()
 
 struct mali_hwc
 {
-	Json::Value::Int64 cpu_cycles;
-	Json::Value::Int64 cpu_instructions;
-	Json::Value::Int64 gpu_cycles;
-	Json::Value::Int64 fragment_cycles;
-	Json::Value::Int64 vertex_cycles;
-	Json::Value::Int64 read_bw;
-	Json::Value::Int64 write_bw;
-	Json::Value::Int64 vertex_jobs;
-	Json::Value::Int64 fragment_jobs;
+	Json::Value cpu_cycles;
+	Json::Value cpu_instructions;
+	Json::Value gpu_cycles;
+	Json::Value fragment_cycles;
+	Json::Value vertex_cycles;
+	Json::Value read_bw;
+	Json::Value write_bw;
+	Json::Value vertex_jobs;
+	Json::Value fragment_jobs;
 } mali_samples;
 static hwcpipe::HWCPipe *hwcpipe = nullptr;
 static bool is_mali = false;
@@ -135,8 +135,8 @@ static void mali_perf_sample()
         for (const auto& pair : *m.cpu)
         {
             const Json::Value::Int64 value = pair.second.get<int64_t>();
-            if (pair.first == hwcpipe::CpuCounter::Cycles) mali_samples.cpu_cycles += value;
-            else if (pair.first == hwcpipe::CpuCounter::Instructions) mali_samples.cpu_instructions += value;
+            if (pair.first == hwcpipe::CpuCounter::Cycles) mali_samples.cpu_cycles.append(Json::Int64(value));
+            else if (pair.first == hwcpipe::CpuCounter::Instructions) mali_samples.cpu_instructions.append(Json::Int64(value));
         }
     }
     if (m.gpu)
@@ -146,13 +146,13 @@ static void mali_perf_sample()
             const Json::Value::Int64 value = pair.second.get<int64_t>();
             switch (pair.first)
             {
-            case hwcpipe::GpuCounter::GpuCycles: mali_samples.gpu_cycles += value; break;
-            case hwcpipe::GpuCounter::FragmentCycles: mali_samples.fragment_cycles += value; break;
-            case hwcpipe::GpuCounter::VertexComputeCycles : mali_samples.vertex_cycles += value; break;
-            case hwcpipe::GpuCounter::ExternalMemoryReadBytes : mali_samples.read_bw += value; break;
-            case hwcpipe::GpuCounter::ExternalMemoryWriteBytes : mali_samples.write_bw += value; break;
-            case hwcpipe::GpuCounter::VertexComputeJobs : mali_samples.vertex_jobs += value; break;
-            case hwcpipe::GpuCounter::FragmentJobs : mali_samples.fragment_jobs += value; break;
+            case hwcpipe::GpuCounter::GpuCycles: mali_samples.gpu_cycles.append(Json::Int64(value)); break;
+            case hwcpipe::GpuCounter::FragmentCycles: mali_samples.fragment_cycles.append(Json::Int64(value)); break;
+            case hwcpipe::GpuCounter::VertexComputeCycles : mali_samples.vertex_cycles.append(Json::Int64(value)); break;
+            case hwcpipe::GpuCounter::ExternalMemoryReadBytes : mali_samples.read_bw.append(Json::Int64(value)); break;
+            case hwcpipe::GpuCounter::ExternalMemoryWriteBytes : mali_samples.write_bw.append(Json::Int64(value)); break;
+            case hwcpipe::GpuCounter::VertexComputeJobs : mali_samples.vertex_jobs.append(Json::Int64(value)); break;
+            case hwcpipe::GpuCounter::FragmentJobs : mali_samples.fragment_jobs.append(Json::Int64(value)); break;
             default: break; // ignore
             }
         }
@@ -1249,8 +1249,10 @@ void Retracer::RetraceThread(const int threadidx, const int our_tid)
                 uint64_t pre = gettime();
                 (*(RetraceFunc)fptr)(src);
                 uint64_t post = gettime();
+                uint64_t used_time = post - pre;
                 mCallStats[funcName].count++;
-                mCallStats[funcName].time += post - pre;
+                mCallStats[funcName].time += used_time;
+                mCallTimes.push_back(used_time);
             }
             else if (!mOptions.mCacheOnly || cachevals[mCurCall.funcId])
             {
@@ -1802,16 +1804,22 @@ void Retracer::saveResult(Json::Value& result)
             mCallStats["NO-OP"].time += post - pre;
             usleep(c); // just to use c for something, to make 100% sure it is not optimized away
         }
+        float noop_avg = (float)mCallStats["NO-OP"].time / mCallStats["NO-OP"].count;
 #if ANDROID
-        const char *filename = "/sdcard/callstats.csv";
+        // Write times to the results json
+        Json::Value jsonTimeArray;
+        // Iterate through the list and add each uint64_t element to the JSON array
+        for (const auto& value : mCallTimes) {
+            jsonTimeArray.append(Json::UInt64(value));
+        }
+        result["call_time"] = jsonTimeArray;
+        result["noop_for_calibration"] = noop_avg;
 #else
         const char *filename = "callstats.csv";
-#endif
         FILE *fp = fopen(filename, "w");
         if (fp)
         {
             uint64_t total = 0;
-            float noop_avg = (float)mCallStats["NO-OP"].time / mCallStats["NO-OP"].count;
             fprintf(fp, "Function,Calls,Time,Calibrated_Time\n");
             for (const auto& pair : mCallStats)
             {
@@ -1828,7 +1836,6 @@ void Retracer::saveResult(Json::Value& result)
             }
             fsync(fileno(fp));
             fclose(fp);
-
             const float ddk_fps = ((float)numOfFrames * std::max(1, mLoopTimes)) / ticksToSeconds(total);
             const float ddk_mspf = (1000 * ticksToSeconds(total)) / (float)numOfFrames;
             result["fps_ddk"] = ddk_fps;
@@ -1840,7 +1847,9 @@ void Retracer::saveResult(Json::Value& result)
         {
             DBG_LOG("Failed to open output callstats in %s: %s\n", filename, strerror(errno));
         }
+#endif
         mCallStats.clear();
+        mCallTimes.clear();
     }
 
     DBG_LOG("Saving results...\n");

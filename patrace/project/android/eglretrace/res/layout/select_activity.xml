@@ -208,7 +208,7 @@
                         android:layout_width="80dp"
                         android:layout_height="wrap_content"
                         android:id="@+id/option_frameend"
-                        android:text="99999"
+                        android:text="9999999"
                     />
                 </LinearLayout>
                 <LinearLayout
