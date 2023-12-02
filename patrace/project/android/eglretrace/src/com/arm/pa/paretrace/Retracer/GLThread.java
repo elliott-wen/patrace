@@ -255,8 +255,6 @@ public class GLThread extends Thread {
             return;
         }
 
-        String resultFile = parentIntent.getStringExtra("resultFile");
-
         String json_data = new String();
         String trace_file_path = new String();
 
@@ -433,16 +431,11 @@ public class GLThread extends Thread {
             json_data = js.toString();
         }
 
-        if (resultFile == null) {
-            Log.e(TAG, "result file is null.");
-            resultFile = "/sdcard/result.json";
-        }
+        String resultDir = mRetraceActivity.getExternalCacheDir().toString() + "/";
 
-        resultFile = mRetraceActivity.getExternalCacheDir() + "/result.json";
+        Log.i(TAG, "Saving result the into: " + resultDir);
 
-        Log.i(TAG, "Saving result the into: " + resultFile);
-
-        if (!NativeAPI.initFromJson(json_data, trace_file_path, resultFile)) {
+        if (!NativeAPI.initFromJson(json_data, trace_file_path, resultDir)) {
             Log.e(TAG, "Could not initialise the retracer from JSON!");
             return;
         }

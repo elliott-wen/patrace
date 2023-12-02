@@ -191,15 +191,9 @@ static void mali_perf_end(Json::Value& v)
 
 static GLuint pm_monitor = 0;
 static bool amd_perf_activated = false;
-#ifdef ANDROID
-const char *perfmon_filename = "/data/local/tmp/perfmon.csv";
-const char *perfmon_counters = "/data/local/tmp/perfmon_counters.csv";
-const char *perfmon_settings = "/data/local/tmp/perfmon.conf";
-#else
 const char *perfmon_filename = "perfmon.csv";
 const char *perfmon_counters = "perfmon_counters.csv";
 const char *perfmon_settings = "perfmon.conf";
-#endif
 
 static void perfmon_list()
 {
@@ -207,7 +201,12 @@ static void perfmon_list()
     GLint numGroups = 0;
     _glGetPerfMonitorGroupsAMD(&numGroups, 0, NULL);
     std::vector<GLuint> groups(numGroups);
+#ifdef ANDROID
+    std::string pm_fp_path = TraceExecutor::getOutputFilePath(perfmon_counters);
+    FILE* pm_fp = fopen(pm_fp_path.c_str(), "w");
+#else
     FILE* pm_fp = fopen(perfmon_counters, "w");
+#endif
     if (!pm_fp)
     {
         DBG_LOG("Could not open file for writing perfmon counter list: %s\n", strerror(errno));
@@ -258,6 +257,7 @@ static void amd_perf_init(const char *vendor)
         return;
     }
     perfmon_list();
+
     FILE* pm_fp = fopen(perfmon_settings, "r");
     if (pm_fp)
     {
@@ -332,7 +332,12 @@ static void amd_perf_init(const char *vendor)
         return;
     }
     // Write out csv header if file does not exist already
+#ifdef ANDROID
+    std::string pm_fp_path_1 = TraceExecutor::getOutputFilePath(perfmon_filename);
+    pm_fp = fopen(pm_fp_path_1.c_str(), "w");
+#else
     pm_fp = fopen(perfmon_filename, "w");
+#endif
     if (!pm_fp)
     {
         DBG_LOG("Could not open file %s for writing perfmon header: %s\n", perfmon_filename, strerror(errno));
@@ -382,7 +387,14 @@ static void amd_perf_end(Json::Value& v)
     {
         DBG_LOG("perfmon end : FAILED\n");
     }
+
+#ifdef ANDROID
+    std::string pm_fp_path_1 = TraceExecutor::getOutputFilePath(perfmon_filename);
+    FILE* pm_fp = fopen(pm_fp_path_1.c_str(), "a");
+#else
     FILE* pm_fp = fopen(perfmon_filename, "a");
+#endif
+    
     if (!pm_fp)
     {
         DBG_LOG("Could not open file %s for writing perfmon data: %s\n", perfmon_filename, strerror(errno));
@@ -1811,15 +1823,16 @@ void Retracer::saveResult(Json::Value& result)
         }
         float noop_avg = (float)mCallStats["NO-OP"].time / mCallStats["NO-OP"].count;
 #if ANDROID
-        // Write times to the results json
-        // Json::Value jsonTimeArray;
-        // Iterate through the list and add each uint64_t element to the JSON array
-        // for (const auto& value : mCallTimes) {
-        //     jsonTimeArray.append(Json::UInt64(value));
-        // }
-        // result["call_time"] = jsonTimeArray;
-
         result["noop_for_calibration"] = noop_avg;
+        std::string fp_path = TraceExecutor::getOutputFilePath("calltime.bin");
+        FILE* pm_fp = fopen(fp_path.c_str(), "w");
+        if (pm_fp) {
+            DBG_LOG("Write detail timings into hard disk %s", fp_path.c_str());
+            fwrite(mCallTimes.data(), 1, mCallTimes.size() * sizeof(uint64_t), pm_fp);
+            fclose(pm_fp);
+        } else {
+            DBG_LOG("Unable to write detail timing into hard disk", fp_path.c_str());
+        }
 #else
         const char *filename = "callstats.csv";
         FILE *fp = fopen(filename, "w");

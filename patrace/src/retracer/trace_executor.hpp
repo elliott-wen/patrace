@@ -54,12 +54,16 @@ class TraceExecutor{
     // there can only be one TraceExector, so all its methods and variable are static
 
     public:
-        static void initFromJson(const std::string& json_data, const std::string& trace_dir, const std::string& result_file);
+        static void initFromJson(const std::string& json_data, const std::string& trace_dir, const std::string& result_dir);
         static void writeError(const std::string &error_description = std::string());
         static bool writeData(Json::Value result_data_value, int frames, float duration);
         static void clearResult();
         static void clearError();
         static bool isSetup();
+
+#ifdef ANDROID
+        static std::string getOutputFilePath(const char *requiredFileName);
+#endif
 
         static void addDisabledButActiveAttribute(int program, const std::string& attributeName);
         static Json::Value& addProgramInfo(int program, int originalProgramName, retracer::hmap<unsigned int>& shaderRevMap);
@@ -67,7 +71,7 @@ class TraceExecutor{
         static const char* ErrorNames[];
 
     private:
-        static std::string mResultFile;
+        static std::string mResultDir;
         static std::vector<std::string> mErrorList;
         struct ResultFile
         {

@@ -236,11 +236,11 @@ bool ParseCommandLine(int argc, char** argv, RetraceOptions& mOptions)
             }
         } else if (!strcmp(arg, "-jsonParameters")) {
             const char *jsonParameters = argv[++i];
-            const char *resultFile = argv[++i];
+            const char *resultDir = argv[++i];
             const char *traceDir = argv[++i];
             std::ifstream t(jsonParameters);
             std::string str((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
-            TraceExecutor::initFromJson(str, traceDir, resultFile);
+            TraceExecutor::initFromJson(str, traceDir, resultDir);
         } else if (!strcmp(arg, "-info")) {
             printHeaderInfo = true;
         } else if (!strcmp(arg, "-debug")) {

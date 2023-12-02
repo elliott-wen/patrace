@@ -29,7 +29,7 @@
 #include <android/log.h>
 #endif
 
-std::string TraceExecutor::mResultFile;
+std::string TraceExecutor::mResultDir = "./";
 std::vector<std::string> TraceExecutor::mErrorList;
 ProgramAttributeListMap_t TraceExecutor::mProgramAttributeListMap;
 ProgramInfoList_t TraceExecutor::mProgramInfoList;
@@ -395,9 +395,9 @@ void TraceExecutor::overrideDefaultsWithJson(Json::Value &value)
  @param result_file The path where the result should be written.
  @return Returns true if successful. If false is returned, an error might be written to the result file.
  */
-void TraceExecutor::initFromJson(const std::string& json_data, const std::string& trace_dir, const std::string& result_file)
+void TraceExecutor::initFromJson(const std::string& json_data, const std::string& trace_dir, const std::string& result_dir)
 {
-    mResultFile = result_file;
+    mResultDir = result_dir;
 
     /*
      * The order is important here:
@@ -543,6 +543,12 @@ void TraceExecutor::clearError()
     mErrorList.clear();
 }
 
+#ifdef ANDROID
+std::string TraceExecutor::getOutputFilePath(const char *requiredFileName) {
+    return mResultDir + requiredFileName;
+}
+#endif
+
 bool TraceExecutor::writeData(Json::Value result_data_value, int frames, float duration)
 {
     Json::Value result_value;
@@ -680,16 +686,7 @@ bool TraceExecutor::writeData(Json::Value result_data_value, int frames, float d
     Json::StyledWriter writer;
     std::string data = writer.write(result_value);
 
-    // Honor mResultFile if it is not empty
-    std::string outputfile = mResultFile;
-    if (mResultFile.empty())
-    {
-#ifdef ANDROID
-        outputfile = "/sdcard/results.json";
-#else
-        outputfile = "results.json";
-#endif
-    }
+    std::string outputfile = mResultDir + "result.json";
 
     FILE* fp = fopen(outputfile.c_str(), "w");
     if (!fp)
