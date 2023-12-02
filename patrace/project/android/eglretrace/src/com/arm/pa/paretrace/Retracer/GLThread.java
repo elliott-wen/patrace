@@ -435,8 +435,12 @@ public class GLThread extends Thread {
 
         if (resultFile == null) {
             Log.e(TAG, "result file is null.");
-            resultFile = "/sdcard/results.json";
+            resultFile = "/sdcard/result.json";
         }
+
+        resultFile = mRetraceActivity.getExternalCacheDir() + "/result.json";
+
+        Log.i(TAG, "Saving result the into: " + resultFile);
 
         if (!NativeAPI.initFromJson(json_data, trace_file_path, resultFile)) {
             Log.e(TAG, "Could not initialise the retracer from JSON!");

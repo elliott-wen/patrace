@@ -192,9 +192,9 @@ static void mali_perf_end(Json::Value& v)
 static GLuint pm_monitor = 0;
 static bool amd_perf_activated = false;
 #ifdef ANDROID
-const char *perfmon_filename = "/sdcard/perfmon.csv";
-const char *perfmon_counters = "/sdcard/perfmon_counters.csv";
-const char *perfmon_settings = "/sdcard/perfmon.conf";
+const char *perfmon_filename = "/data/local/tmp/perfmon.csv";
+const char *perfmon_counters = "/data/local/tmp/perfmon_counters.csv";
+const char *perfmon_settings = "/data/local/tmp/perfmon.conf";
 #else
 const char *perfmon_filename = "perfmon.csv";
 const char *perfmon_counters = "perfmon_counters.csv";
@@ -1250,9 +1250,14 @@ void Retracer::RetraceThread(const int threadidx, const int our_tid)
                 (*(RetraceFunc)fptr)(src);
                 uint64_t post = gettime();
                 uint64_t used_time = post - pre;
+#ifdef ANDROID
+                // In android build, we calculate detail timing.
+                mCallTimes.push_back(used_time);
+#else
                 mCallStats[funcName].count++;
                 mCallStats[funcName].time += used_time;
-                mCallTimes.push_back(used_time);
+#endif
+                
             }
             else if (!mOptions.mCacheOnly || cachevals[mCurCall.funcId])
             {
@@ -1807,12 +1812,13 @@ void Retracer::saveResult(Json::Value& result)
         float noop_avg = (float)mCallStats["NO-OP"].time / mCallStats["NO-OP"].count;
 #if ANDROID
         // Write times to the results json
-        Json::Value jsonTimeArray;
+        // Json::Value jsonTimeArray;
         // Iterate through the list and add each uint64_t element to the JSON array
-        for (const auto& value : mCallTimes) {
-            jsonTimeArray.append(Json::UInt64(value));
-        }
-        result["call_time"] = jsonTimeArray;
+        // for (const auto& value : mCallTimes) {
+        //     jsonTimeArray.append(Json::UInt64(value));
+        // }
+        // result["call_time"] = jsonTimeArray;
+
         result["noop_for_calibration"] = noop_avg;
 #else
         const char *filename = "callstats.csv";
@@ -1859,6 +1865,7 @@ void Retracer::saveResult(Json::Value& result)
     }
     mLoopResults.clear();
     TraceExecutor::clearResult();
+
 
     if (mOptions.mDebug)
     {

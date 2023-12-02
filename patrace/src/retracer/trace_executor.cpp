@@ -132,7 +132,13 @@ void TraceExecutor::overrideDefaultsWithJson(Json::Value &value)
         };
     }
 
+   
+#ifdef ANDROID
+    options.mCallStats = true;
+#else
     options.mCallStats = value.get("callStats", options.mCallStats).asBool();
+#endif
+
     if (options.mCallStats && !usedFramerange)
     {
         gRetracer.reportAndAbort("callStats requires frames to also be present in the JSON input!\n");
@@ -266,10 +272,14 @@ void TraceExecutor::overrideDefaultsWithJson(Json::Value &value)
         options.dmaSharedMemory = true;
     }
 
+#ifdef ANDROID
+    options.mPerfmon = true;
+#else
     if (value.get("perfmon", false).asBool())
     {
         options.mPerfmon = true;
     }
+#endif
 
     if (value.get("step", false).asBool())
     {
@@ -670,15 +680,17 @@ bool TraceExecutor::writeData(Json::Value result_data_value, int frames, float d
     Json::StyledWriter writer;
     std::string data = writer.write(result_value);
 
-#ifdef ANDROID
-    std::string outputfile = "/sdcard/results.json";
-#else
-    std::string outputfile = "results.json";
-#endif
-    if (!mResultFile.empty())
+    // Honor mResultFile if it is not empty
+    std::string outputfile = mResultFile;
+    if (mResultFile.empty())
     {
-        outputfile = mResultFile;
+#ifdef ANDROID
+        outputfile = "/sdcard/results.json";
+#else
+        outputfile = "results.json";
+#endif
     }
+
     FILE* fp = fopen(outputfile.c_str(), "w");
     if (!fp)
     {

@@ -385,7 +385,6 @@ public class SelectActivity extends Activity
     {
     	Intent intent = new Intent(this, RetraceActivity.class);
         intent.putExtra("fileName", trace.getFile().getAbsolutePath());
-        intent.putExtra("resultFile", trace.getFile().getAbsolutePath()+".result");
         intent.putExtra("isGui", true);
 
         boolean enable_snapshot = ((CheckBox)findViewById(R.id.option_enablesnapshot)).isChecked();
