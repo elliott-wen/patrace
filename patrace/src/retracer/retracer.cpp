@@ -1263,8 +1263,9 @@ void Retracer::RetraceThread(const int threadidx, const int our_tid)
                 uint64_t post = gettime();
                 uint64_t used_time = post - pre;
 #ifdef ANDROID
-                // In android build, we calculate detail timing.
-                mCallTimes.push_back(used_time);
+                // In android build, we calculate detail timing, uint32_t is definitely enough
+                uint64_t combined_value = ((uint64_t)mFile.curCallNo << 32) | (uint32_t)(used_time);
+                mCallTimes.push_back(combined_value);
 #else
                 mCallStats[funcName].count++;
                 mCallStats[funcName].time += used_time;
@@ -1831,7 +1832,7 @@ void Retracer::saveResult(Json::Value& result)
             fwrite(mCallTimes.data(), 1, mCallTimes.size() * sizeof(uint64_t), pm_fp);
             fclose(pm_fp);
         } else {
-            DBG_LOG("Unable to write detail timing into hard disk", fp_path.c_str());
+            DBG_LOG("Unable to write detail timing into hard disk %s", fp_path.c_str());
         }
 #else
         const char *filename = "callstats.csv";

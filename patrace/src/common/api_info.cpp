@@ -23,6 +23,7 @@ void ApiInfo::RegisterEntries(const EntryMap& entries, bool all)
             DBG_LOG("Unsupported function: %s\n", it->first.c_str());
         }
     }
+
 }
 
 }

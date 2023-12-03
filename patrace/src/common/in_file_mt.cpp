@@ -39,6 +39,7 @@ bool InFile::readChunk(std::vector<char> *buf)
 {
     if (mCompressedRemaining < 4) { return false; }
     size_t compressedLength = *(unsigned*)mCompressedSource;
+
     mCompressedRemaining -= 4;
     mCompressedSource += 4;
     if ((int64_t)compressedLength <= mCompressedRemaining)
@@ -50,6 +51,7 @@ bool InFile::readChunk(std::vector<char> *buf)
             abort();
         }
         buf->resize(uncompressedLength);
+       
         if (!snappy::RawUncompress(mCompressedSource, compressedLength, buf->data()))
         {
             DBG_LOG("Failed to decompress chunk of size %u - file is corrupt - aborting!\n", (unsigned)compressedLength);

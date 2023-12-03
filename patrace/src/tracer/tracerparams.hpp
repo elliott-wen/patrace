@@ -11,7 +11,7 @@ public:
     bool EnableErrorCheck = false;                  // Enable error checking that is stored in trace file after each GLES call
     bool EnableActiveAttribCheck = true;            // Only query actually used active attributes. Fixes performance issues on Qcom
     bool InteractiveIntercept = false;              // Debugging tool
-    bool FilterSupportedExtension = false;          // Respond with given list of extensions instead of what the driver says
+    bool FilterSupportedExtension = true;          // Respond with given list of extensions instead of what the driver says
     std::vector<std::string> SupportedExtensions;   // Our own list of extensions for the above option
     std::string SupportedExtensionsString;
     std::string RendererName = "";
