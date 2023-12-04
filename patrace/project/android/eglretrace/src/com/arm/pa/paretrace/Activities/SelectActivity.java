@@ -134,6 +134,7 @@ public class SelectActivity extends Activity
     	mTraceList.clear();
         appendTracesInDir(new File("/data/local/tmp/apitrace"), true, mTraceList);
         appendTracesInDir(new File(Util.getTraceFilePath()), true, mTraceList);
+        appendTracesInDir(getExternalCacheDir(), true, mTraceList);
         Collections.sort(mTraceList, Trace.fileNameComparator);
     }
 
