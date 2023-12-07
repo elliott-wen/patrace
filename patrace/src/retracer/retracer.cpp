@@ -1836,12 +1836,7 @@ void Retracer::saveResult(Json::Value& result)
             DBG_LOG("Unable to write detail timing into hard disk %s", fp_path.c_str());
         }
 
-        // Write a dummy file
-        fp_path = TraceExecutor::getOutputFilePath("done.bin");
-        pm_fp = fopen(fp_path.c_str(), "w");
-        if (pm_fp) {
-            fclose(pm_fp);
-        }
+        
 #else
         const char *filename = "callstats.csv";
         FILE *fp = fopen(filename, "w");
@@ -1927,6 +1922,13 @@ void Retracer::saveResult(Json::Value& result)
                 break;
             }
         }
+    }
+
+    // Write a dummy file
+    std::string fp_path = TraceExecutor::getOutputFilePath("done.bin");
+    FILE* pm_fp = fopen(fp_path.c_str(), "w");
+    if (pm_fp) {
+        fclose(pm_fp);
     }
 #endif
 }
