@@ -1257,7 +1257,7 @@ void Retracer::RetraceThread(const int threadidx, const int our_tid)
             }
             else if (mOptions.mCallStats && mCurFrameNo >= mOptions.mBeginMeasureFrame && mCurFrameNo < mOptions.mEndMeasureFrame)
             {
-                const char *funcName = mFile.ExIdToName(mCurCall.funcId);
+                
                 uint64_t pre = gettime();
                 (*(RetraceFunc)fptr)(src);
                 uint64_t post = gettime();
@@ -1267,6 +1267,7 @@ void Retracer::RetraceThread(const int threadidx, const int our_tid)
                 uint64_t combined_value = ((uint64_t)mFile.curCallNo << 32) | (uint32_t)(used_time);
                 mCallTimes.push_back(combined_value);
 #else
+                const char *funcName = mFile.ExIdToName(mCurCall.funcId);
                 mCallStats[funcName].count++;
                 mCallStats[funcName].time += used_time;
 #endif
@@ -1833,6 +1834,13 @@ void Retracer::saveResult(Json::Value& result)
             fclose(pm_fp);
         } else {
             DBG_LOG("Unable to write detail timing into hard disk %s", fp_path.c_str());
+        }
+
+        // Write a dummy file
+        fp_path = TraceExecutor::getOutputFilePath("done.bin");
+        pm_fp = fopen(fp_path.c_str(), "w");
+        if (pm_fp) {
+            fclose(pm_fp);
         }
 #else
         const char *filename = "callstats.csv";
