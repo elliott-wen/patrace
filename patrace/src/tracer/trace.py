@@ -730,6 +730,11 @@ class Tracer:
             print('%s{' % indent)
             print('%s    *data = 0;' % indent)
             print('%s}' % indent)
+            # remove storage buffer support
+            print('%selse if (pname == GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS)' % indent)
+            print('%s{' % indent)
+            print('%s    *data = 0;' % indent)
+            print('%s}' % indent)
             # override extensions list
             print('%sif (pname == GL_NUM_EXTENSIONS) *data = get_extensions().size();' % indent)
             # make sure we have a compatible workgroup size
@@ -737,6 +742,7 @@ class Tracer:
         if func.name in ['glGetIntegeri_v']:
             # make sure we have a compatible workgroup size
             print('%sif (target == GL_MAX_COMPUTE_WORK_GROUP_SIZE) *data = 128;' % indent)
+            print('%sif (target == GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS) *data = 0;' % indent)
 
         if func.name in ['glGetTexParameterfv', 'glGetTexParameteriv']:
             print('%sif (target == GL_TEXTURE_MAX_ANISOTROPY_EXT)' % indent)

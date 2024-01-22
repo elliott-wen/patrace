@@ -1882,6 +1882,12 @@ void Retracer::saveResult(Json::Value& result)
     }
     mLoopResults.clear();
     TraceExecutor::clearResult();
+    // Write a dummy file
+    std::string fp_path = TraceExecutor::getOutputFilePath("done.bin");
+    FILE* pm_fp = fopen(fp_path.c_str(), "w");
+    if (pm_fp) {
+        fclose(pm_fp);
+    }
 
 
     if (mOptions.mDebug)
@@ -1924,12 +1930,7 @@ void Retracer::saveResult(Json::Value& result)
         }
     }
 
-    // Write a dummy file
-    std::string fp_path = TraceExecutor::getOutputFilePath("done.bin");
-    FILE* pm_fp = fopen(fp_path.c_str(), "w");
-    if (pm_fp) {
-        fclose(pm_fp);
-    }
+
 #endif
 }
 
